@@ -1,5 +1,11 @@
 import re
 
+# readBLESeqListFromFile
+# read sequence number of each BLE packet from log, which is in format of "ff:ff:ff:01:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"
+# the return value is a list, each element of this list is a tuple. Tuple contains 3 elements:
+# 1. BLE packet sequence str, e.g. '01' 
+# 2. line number: in which line this packet is located 
+# 3. packet number: count the sequence number of this packet, starting from 1
 def readBLESeqListFromFile(filename):
   regex = re.compile(r'(?<=ff:ff:ff:)[0-9a-c]{1}[0-9a-f]{1}')
   linecnt=0
@@ -18,6 +24,9 @@ def readBLESeqListFromFile(filename):
       
   return seqList
 
+# detect loss
+# 'loss' is defined as: if seq1 + 1 != seq2, a loss is detected.
+# Exceptional case: the BLE packet sequence number counts from 1 to 200. If seq1 = 200, seq2 = 1, there is no loss.
 def scanPacketLossFromPacketList(seqList):
   packetLossList = []
   for idx in range(len(seqList)-1):
